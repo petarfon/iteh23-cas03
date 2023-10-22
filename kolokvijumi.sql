@@ -31,7 +31,7 @@ USE `kolokvijumi`;
 
 DROP TABLE IF EXISTS `prijave`;
 CREATE TABLE `prijave` (
-  `id` int(11) NOT NULL,
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `predmet` varchar(255) NOT NULL,
   `katedra` varchar(255) NOT NULL,
   `sala` varchar(255) NOT NULL,
@@ -43,9 +43,9 @@ CREATE TABLE `prijave` (
 --
 
 INSERT INTO `prijave` (`id`, `predmet`, `katedra`, `sala`, `datum`) VALUES
-(10, 'Matematika 1', 'Matematika', '015', '2020-12-26'),
-(11, 'Matematika 2', 'Matematika', '015', '2020-12-12'),
-(25, 'ITEH', 'ELAB', '105', '2021-01-19');
+(1, 'Matematika 1', 'Matematika', '015', '2020-12-26'),
+(2, 'Matematika 2', 'Matematika', '015', '2020-12-12'),
+(3, 'ITEH', 'ELAB', '105', '2021-01-19');
 
 -- --------------------------------------------------------
 

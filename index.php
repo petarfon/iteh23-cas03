@@ -2,30 +2,41 @@
 
 require "dbBroker.php";
 require "model/user.php";
+//require "model/prijava.php";
+
 
 session_start();
+if (!isset($_SESSION['user_id'])) {
+    if (isset($_POST['username']) && isset($_POST['password'])) {
+        $uname = $_POST['username'];
+        $upass = $_POST['password'];
 
-if (isset($_POST['username']) && isset($_POST['password'])) {
-    $name = $_POST['username'];
-    $pass = $_POST['password'];
-    $id = 1;
+        // $conn = new mysqli() /// pregazena konekcija iz dbBrokera;
+        $korisnik = new User(1, $uname, $upass);
+        // $odg = $korisnik->logInUser($uname, $upass, $conn);
+        $odg = User::logInUser($korisnik, $conn); //pristup statickim funkcijama preko klase
 
-    if (strlen($name) < 3 && strlen($pass) < 3) {
-        exit();
+        if ($odg->num_rows == 1) {
+            echo  `
+        <script>
+        console.log( "Uspešno ste se prijavili");
+        </script>
+        `;
+            $_SESSION['user_id'] = $korisnik->id;
+            header('Location: home.php');
+            exit();
+        } else {
+            echo `
+        <script>
+        console.log( "Niste se prijavili!");
+        </script>
+        `;
+        }
     }
-
-    $user = new User($id, $name, $pass);
-    //$result = $user->logIn($user, $conn);
-    $result = User::logIn($user, $conn);
-
-    echo json_encode($result->num_rows);
-    echo json_encode($_POST['username'] . " " . $_POST['password']);
-
-    if ($result->num_rows == 1) {
-        $_SESSION['user_id'] = $id;
-        header('Location: home.php');
-        exit();
-    }
+} else {
+    //ako je već ulogovan uključi obradu i pošalji ga nazad na home
+    include "obrada.php";
+    header("Location: home.php");
 }
 
 ?>

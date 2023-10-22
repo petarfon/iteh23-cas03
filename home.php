@@ -1,12 +1,22 @@
 <?php
 
-require "dbBroker.php";
+require "./dbBroker.php";
 require "model/prijava.php";
 
-$result = Prijava::getAll($conn);
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+
+$rezultat = Prijava::getAll($conn);
+
+if (!$rezultat) {
+    echo "Greska prilikom izvrsavanja upita";
+}
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,7 +26,7 @@ $result = Prijava::getAll($conn);
     <link rel="shortcut icon">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/home.css">
-    <title>FON: Prijava kolokvijuma i ispita</title>
+    <title>FON: Prijava kolokvijuma</title>
 
 </head>
 
@@ -42,75 +52,72 @@ $result = Prijava::getAll($conn);
     </div>
 
     <div id="pregled" class="panel panel-success" style="margin-top: 1%;">
-
-        <div class="panel-body">
-            <table id="myTable" class="table table-hover table-striped" style="color: black; background-color: grey;">
-                <thead class="thead">
-                    <tr>
-                        <th scope="col">Predmet</th>
-                        <th scope="col">Katedra</th>
-                        <th scope="col">Sala</th>
-                        <th scope="col">Datum</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    while ($red = $result->fetch_array()) {
-                    ?>
+        <?php
+        if ($rezultat->num_rows == 0) {
+            echo "Nema prijava na kolokvijume";
+            // die();
+        } else {
+        ?>
+            <div class="panel-body">
+                <table id="myTable" class="table table-hover table-striped" style="color: black; background-color: grey;">
+                    <thead class="thead">
                         <tr>
-                            <td><?php echo $red["predmet"] ?></td>
-                            <td><?php echo $red["katedra"] ?></td>
-                            <td><?php echo $red["sala"] ?></td>
-                            <td><?php echo $red["datum"] ?></td>
-                            <td>
-                                <label class="custom-radio-btn">
-                                    <input type="radio" name="checked-donut" value=<?php echo $red["id"] ?>>
-                                    <span class="checkmark"></span>
-                                </label>
-                            </td>
-
+                            <th scope="col">Predmet</th>
+                            <th scope="col">Katedra</th>
+                            <th scope="col">Sala</th>
+                            <th scope="col">Datum Kolokvijuma</th>
                         </tr>
-                    <?php
-                    }
-                    ?>
-                </tbody>
-            </table>
-            <div class="row">
-                <div class="col-md-1" style="text-align: right">
-                    <button id="btn-izmeni" class="btn btn-warning" data-toggle="modal" data-target="#izmeniModal">Izmeni</button>
+                    </thead>
+                    <tbody>
+                        <?php
+                        while ($red = $rezultat->fetch_array()) :
+                            // while($red=$rezultat->fetch_object()):
+                        ?>
+                            <tr>
+                                <td><?php echo $red["predmet"] ?></td>
+                                <!-- <td><?php // echo $red->predmet;
+                                            ?></td> -->
+                                <td><?php echo $red["katedra"] ?></td>
+                                <td><?php echo $red["sala"] ?></td>
+                                <td><?php echo $red["datum"] ?></td>
+                                <td>
+                                    <form action="obrada.php" method="post">
+                                        <input type="radio" name="delete-prijava" value=<?php echo $red["id"] ?>>
+                                        <input type="submit" name="delete" value="Delete">
+                                    </form>
+                                </td>
 
-                </div>
+                            </tr>
+                        <?php
+                        endwhile;
+                        ?>
 
-                <div class="col-md-12" style="text-align: right">
-                    <button id="btn-obrisi" class="btn btn-danger" style="background-color: red; border: 1px solid white;">Obrisi</button>
-                </div>
+                    </tbody>
+                </table>
 
-                <div class="col-md-2" style="text-align: right">
-                    <button id="btn-sortiraj" class="btn btn-normal" onclick="sortTable()">Sortiraj</button>
-                </div>
-
+            <?php } // zatvaranje else-a
+            ?>
             </div>
-        </div>
     </div>
 
     <!-- Modal -->
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog">
 
-            <!--Sadrzaj modala-->
+            <!--Sadrzaj Zakaži modala-->
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="container prijava-form">
-                        <form action="#" method="post" id="dodajForm">
+                        <form action="obrada.php" method="post" id="dodajForm">
                             <h3 style="color: black; text-align: center">Zakazi kolokvijum</h3>
                             <div class="row">
                                 <div class="col-md-11 ">
                                     <div class="form-group">
                                         <label for="">Predmet</label>
-                                        <input type="text" style="border: 1px solid black" name="predmet" class="form-control" />
+                                        <input type="text" style="border: 1px solid black" name="predmet_d" class="form-control" />
                                     </div>
                                     <div class="form-group">
                                         <label for="">Katedra</label>
@@ -195,7 +202,7 @@ $result = Prijava::getAll($conn);
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="js/main.js"></script>
+    <!-- <script src="js/main.js"></script> -->
 
 
 

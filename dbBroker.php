@@ -1,14 +1,14 @@
 <?php
+$host = "localhost";
+$db = "kolokvijumi";
+$user = "root";
+$pass = "";
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db = 'kolokvijumi';
+$conn = new mysqli($host,$user,$pass,$db);
 
 
-
-$conn = new mysqli($host, $user, $pass, $db);
-
-if ($conn->connect_errno) {
-    exit("neuspesna konekcija: " . $conn->connect_errno);
+if ($conn->connect_errno){
+    exit("Nauspesna konekcija: greska> ".$conn->connect_error.", err kod>".$conn->connect_errno);
 }
+
+?>
